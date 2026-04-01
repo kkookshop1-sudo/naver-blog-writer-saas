@@ -56,12 +56,12 @@ export async function POST(req: Request) {
       contentOptions = {},
     } = body;
 
-    // 🐿️ 모델 선택 로직 보강
-    let activeModel = body.model || (provider === "openai" ? "gpt-4o-mini" : "gemini-2.0-flash");
+    // 🐿️ 모델 선택 로직 보강 (2026년 최신 족보 반영!)
+    let activeModel = body.model || (provider === "openai" ? "gpt-4o-mini" : "gemini-1.5-flash");
     
-    // 만약 제미나이인데 모델명이 gpt인 경우 강제로 제미나이 모델로 교체
-    if (provider === "gemini" && (activeModel.includes("gpt") || !activeModel)) {
-      activeModel = "gemini-2.0-flash";
+    // 낡은 모델명(2.0 등)이나 잘못된 모델명이 들어오면 최신형 gemini-1.5-flash로 자동 변신!
+    if (provider === "gemini" && (activeModel.includes("gpt") || activeModel.includes("2.0") || !activeModel)) {
+      activeModel = "gemini-1.5-flash";
     }
 
     const { systemPrompt, userPrompt } = buildPrompt(
