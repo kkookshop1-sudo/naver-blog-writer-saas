@@ -430,8 +430,8 @@ export default function MainPage() {
                 fontSize: "1.05rem",
                 color: "#334155"
               }}>
-                {result.split(/(\[IMAGE_PLACEHOLDER_\d+\])/g).map((part, idx) => {
-                  const match = part.match(/\[IMAGE_PLACEHOLDER_(\d+)\]/);
+                {result.split(/(\[(?:IMAGE_PLACEHOLDER|이미지\s*플레이스홀더|이미지|사진)_?\s*\d+\])/gi).map((part, idx) => {
+                  const match = part.match(/\[(?:IMAGE_PLACEHOLDER|이미지\s*플레이스홀더|이미지|사진)_?\s*(\d+)\]/i);
                   if (match) {
                     const imgIdx = parseInt(match[1]);
                     const imgSrc = imageList[imgIdx];
@@ -448,12 +448,12 @@ export default function MainPage() {
                       </div>
                     ) : (
                       <div key={idx} style={{ padding: "20px", background: "#f8fafc", border: "1px dashed #cbd5e1", borderRadius: "8px", margin: "10px 0", textAlign: "center", color: "#94a3b8" }}>
-                        [이미지 {imgIdx + 1} 라이브러리에 없음]
+                        [라이브러리에 {imgIdx + 1}번 이미지가 없습니다]
                       </div>
                     );
                   }
                   
-                  // 줄바꿈 보존을 위해 다시 p 태그로 감싸기
+                  // 일반 텍스트의 경우 줄바꿈 유지
                   return part.split('\n').map((line, lIdx) => (
                     <p key={`${idx}-${lIdx}`} style={{ marginBottom: line.trim() ? "15px" : "10px", minHeight: line.trim() ? "auto" : "1em" }}>
                       {line}
