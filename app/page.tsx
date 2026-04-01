@@ -175,6 +175,8 @@ export default function MainPage() {
               const uniqueImages = Array.from(new Set([...sData.images, ...currentImages]));
               currentImages = uniqueImages.slice(0, 15); // 최대 15장까지 넉넉히!
               setImageList(currentImages); // 상태도 업데이트해서 화면에 보이게 함
+            } else {
+              alert("알림: 실제 이미지를 수집하지 못했습니다. 검색 단어를 조금 더 구체적으로 적어보세요!");
             }
             
             // 실시간 정보를 텍스트에 포함!
@@ -432,8 +434,8 @@ export default function MainPage() {
                 fontSize: "1.05rem",
                 color: "#334155"
               }}>
-                {result.split(/(\[(?:IMAGE_PLACEHOLDER|이미지\s*플레이스홀더|이미지|사진)_?\s*\d+\])/gi).map((part, idx) => {
-                  const match = part.match(/\[(?:IMAGE_PLACEHOLDER|이미지\s*플레이스홀더|이미지|사진)_?\s*(\d+)\]/i);
+                {result.split(/(\[.*?(?:IMAGE|이미지|사진|PHOTO).*?\d+.*?\])/gi).map((part, idx) => {
+                  const match = part.match(/\[.*?(?:IMAGE|이미지|사진|PHOTO).*?(\d+).*?\]/i);
                   if (match) {
                     const imgIdx = parseInt(match[1]);
                     const imgSrc = imageList[imgIdx];
@@ -441,16 +443,16 @@ export default function MainPage() {
                       <div key={idx} style={{ margin: "30px 0", textAlign: "center" }}>
                         <img 
                           src={imgSrc} 
-                          alt={`Resource ${imgIdx + 1}`} 
+                          alt={`데이터 사진 ${imgIdx + 1}`} 
                           style={{ maxWidth: "100%", borderRadius: "12px", boxShadow: "0 6px 20px rgba(0,0,0,0.15)" }} 
                         />
                         <p style={{ fontSize: "0.85rem", color: "#94a3b8", marginTop: "12px", fontWeight: 500 }}>
-                          📸 이미지 #{imgIdx + 1}
+                          📸 수집된 실제 이미지 #{imgIdx + 1}
                         </p>
                       </div>
                     ) : (
                       <div key={idx} style={{ padding: "20px", background: "#f8fafc", border: "1px dashed #cbd5e1", borderRadius: "8px", margin: "10px 0", textAlign: "center", color: "#94a3b8" }}>
-                        [라이브러리에 {imgIdx + 1}번 이미지가 없습니다]
+                        [죄송합니다! 사진첩에 {imgIdx + 1}번 사진이 없습니다. 왼쪽에서 사진을 더 추가해 주세요!]
                       </div>
                     );
                   }

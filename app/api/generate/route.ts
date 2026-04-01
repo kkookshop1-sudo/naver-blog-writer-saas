@@ -25,7 +25,10 @@ CRITICAL RULES:
 7. Language: ${language}. Tone: ${tone}. Style: ${style}. Audience: ${audience}.
 
 Image Placement:
-Insert [IMAGE_PLACEHOLDER_X] (X=0 to ${imageUrls.length - 1}) where images fit the narrative naturally.`;
+- Insert [IMAGE_PLACEHOLDER_X] (X=0 to ${imageUrls.length - 1}) where images fit the narrative naturally.
+- IMPORTANT: The provided images in the list are ACTUALLY-SCRAPED REAL PHOTOS from the web (Google/Naver). 
+- Always refer to them as "real photos" or "as you see in this picture" in your descriptions to sound human and authentic.
+- Describe the visual details of these real images to guide the reader.`;
 
   const userPrompt = `Write a professional personal blog post about: ${topic}.
 NO # in body. Use bold text for sections.
