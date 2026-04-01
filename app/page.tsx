@@ -56,6 +56,7 @@ export default function MainPage() {
   const [showTopicSuggest, setShowTopicSuggest] = useState(false);
   const [copied, setCopied] = useState(false);
   const [useSearch, setUseSearch] = useState(true); // 🐿️ 기본값: 실시간 자율형 ON! 
+  const [showPreview, setShowPreview] = useState(false); // 🐿️ 미리보기 탭 상태 추가!
 
   const topicSuggestTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const topicWrapperRef = useRef<HTMLDivElement>(null);
@@ -380,9 +381,20 @@ export default function MainPage() {
       {/* Main Area: Editor / Result */}
       <main className="editor-area">
         {result ? (
-          <div className="result-container">
+          <div className="result-container" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 15 }}>
-              <h2 style={{ margin: 0, fontSize: "1.2rem" }}>생성된 원고 본문</h2>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button 
+                  className={`btn ${!showPreview ? "btn-primary" : "btn-secondary"}`} 
+                  onClick={() => setShowPreview(false)}
+                  style={{ padding: "8px 15px", fontSize: "0.85rem" }}
+                >원고 수정 ✍️</button>
+                <button 
+                  className={`btn ${showPreview ? "btn-primary" : "btn-secondary"}`} 
+                  onClick={() => setShowPreview(true)}
+                  style={{ padding: "8px 15px", fontSize: "0.85rem" }}
+                >실제 미리보기 👁️</button>
+              </div>
               <div style={{ display: "flex", gap: "10px" }}>
                 <button className="btn btn-secondary" onClick={() => {
                   navigator.clipboard.writeText(result);
@@ -401,16 +413,52 @@ export default function MainPage() {
                    }}
                    style={{ backgroundColor: platform === "tistory" ? "#ff521a" : "" }}
                 >
-                  {platform === "naver" ? "네이버" : "티스토리"}에 붙여넣기 🚀
+                  {platform === "naver" ? "네이버" : "티스토리"} 열기 🚀
                 </button>
               </div>
             </div>
-            <textarea 
-              className="editable-result"
-              value={result}
-              onChange={e => setResult(e.target.value)}
-              placeholder="이곳에서 자유롭게 수정하세요!"
-            />
+
+            {showPreview ? (
+              <div className="live-preview-box" style={{ 
+                flex: 1, 
+                backgroundColor: "#fff", 
+                borderRadius: "12px", 
+                padding: "40px", 
+                overflowY: "auto",
+                boxShadow: "inset 0 2px 10px rgba(0,0,0,0.05)",
+                lineHeight: "1.8",
+                fontSize: "1.05rem",
+                color: "#334155"
+              }}>
+                {result.split('\n').map((line, idx) => {
+                  const match = line.match(/\[IMAGE_PLACEHOLDER_(\d+)\]/);
+                  if (match) {
+                    const imgIdx = parseInt(match[1]);
+                    const imgSrc = imageList[imgIdx];
+                    return imgSrc ? (
+                      <div key={idx} style={{ margin: "25px 0", textAlign: "center" }}>
+                        <img 
+                          src={imgSrc} 
+                          alt={`Placeholder ${imgIdx}`} 
+                          style={{ maxWidth: "100%", borderRadius: "8px", boxShadow: "0 4px 15px rgba(0,0,0,0.1)" }} 
+                        />
+                        <p style={{ fontSize: "0.8rem", color: "#94a3b8", marginTop: "10px" }}>[대표님의 고화질 이미지 {imgIdx + 1}]</p>
+                      </div>
+                    ) : null;
+                  }
+                  return <p key={idx} style={{ marginBottom: "15px", whiteSpace: "pre-wrap" }}>{line}</p>;
+                })}
+              </div>
+            ) : (
+              <textarea 
+                className="editable-result"
+                value={result}
+                onChange={e => setResult(e.target.value)}
+                placeholder="이곳에서 자유롭게 수정하세요!"
+                style={{ flex: 1, borderRadius: "12px" }}
+              />
+            )}
+            <p style={{ fontSize: "0.8rem", color: "#94a3b8", marginTop: "10px" }}>* 미리보기에서 이미지 배치를 확인하고, 최종 복사하여 블로그에 붙여넣으세요!</p>
           </div>
         ) : (
           <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#cbd5e1", textAlign: "center" }}>

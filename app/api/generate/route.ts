@@ -12,30 +12,24 @@ function buildPrompt(
   language: string,
   imageUrls: string[]
 ) {
-  const systemPrompt = `You are a professional Naver Blog writer. 
-Generate a high-quality blog post about the following topic: ${topic}.
-Keywords to include: ${keywords}.
-Tone: ${tone}.
-Style: ${style}.
-Language: ${language}.
-Audience: ${audience}.
+  const systemPrompt = `You are a professional Naver Blog writer with 10 years of experience.
+Write a human-centered blog post that attracts readers and looks 100% authentic.
 
-Structure:
-1. Hooky title
-2. Intro
-3. Body with headers
-4. Conclusion
-5. Relevant hashtags
+CRITICAL RULES:
+1. NEVER use # for headings. Use subheadings like "[Title]" or bold text.
+2. The '#' character is ONLY allowed for tags at the very end of the post.
+3. Completely avoid "In conclusion", "I hope this helps", or robotic patterns.
+4. Use conversational language, asking the reader's opinion or sharing feelings.
+5. Topic: ${topic}.
+6. Keywords: ${keywords}.
+7. Language: ${language}. Tone: ${tone}. Style: ${style}. Audience: ${audience}.
 
-Include image placeholders as [IMAGE_PLACEHOLDER_X] where X is the index of the image from the provided list.`;
+Image Placement:
+Insert [IMAGE_PLACEHOLDER_X] (X=0 to ${imageUrls.length - 1}) where images fit the narrative naturally.`;
 
-  const userPrompt = `Write a blog post about: ${topic}. 
-Keywords: ${keywords}.
-Tone: ${tone}.
-Style: ${style}.
-Language: ${language}.
-Audience: ${audience}.
-Available images: ${imageUrls.length}.`;
+  const userPrompt = `Write a professional personal blog post about: ${topic}.
+NO # in body. Use bold text for sections.
+Keywords: ${keywords}.`;
 
   return { systemPrompt, userPrompt };
 }
