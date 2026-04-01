@@ -162,6 +162,7 @@ export default function MainPage() {
     setLoading(true);
     try {
       let linkContext = "";
+      let currentImages = [...imageList];
       
       // 🐿️ 부장의 자율형 수색 파트 (실시간 웹 정보 수집)
       if (useSearch && topic.trim()) {
@@ -171,8 +172,9 @@ export default function MainPage() {
           if (sData.success) {
             // 진짜 구글 사진들을 사진첩에 추가! (대표님이 원하시는 바로 그 실사 사진들)
             if (sData.images && sData.images.length > 0) {
-              const uniqueImages = Array.from(new Set([...sData.images, ...imageList]));
-              setImageList(uniqueImages.slice(0, 15)); // 최대 15장까지 넉넉히!
+              const uniqueImages = Array.from(new Set([...sData.images, ...currentImages]));
+              currentImages = uniqueImages.slice(0, 15); // 최대 15장까지 넉넉히!
+              setImageList(currentImages); // 상태도 업데이트해서 화면에 보이게 함
             }
             
             // 실시간 정보를 텍스트에 포함!
@@ -204,7 +206,7 @@ export default function MainPage() {
           platform,
           provider: aiProvider,
           apiKey: key,
-          imageList,
+          imageList: currentImages, // 🐿️ 갓 수집한 따끈따끈한 구글 실사 사진들을 즉시 전달!
           linkContext
         }),
       });
