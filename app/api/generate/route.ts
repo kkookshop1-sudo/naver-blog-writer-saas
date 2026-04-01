@@ -56,12 +56,12 @@ export async function POST(req: Request) {
       contentOptions = {},
     } = body;
 
-    // 🐿️ 모델 선택 로직 보강 (2026년 최신 족보 반영!)
-    let activeModel = body.model || (provider === "openai" ? "gpt-4o-mini" : "gemini-1.5-flash");
+    // 🐿️ 모델 선택 로직 보강 (2026년 초(超)최신 3.1 족보 반영!)
+    let activeModel = body.model || (provider === "openai" ? "gpt-4o-mini" : "gemini-3.1-flash-lite-preview");
     
-    // 낡은 모델명(2.0 등)이나 잘못된 모델명이 들어오면 최신형 gemini-1.5-flash로 자동 변신!
-    if (provider === "gemini" && (activeModel.includes("gpt") || activeModel.includes("2.0") || !activeModel)) {
-      activeModel = "gemini-1.5-flash";
+    // 낡은 모델명(1.5, 2.0 등)이 들어오면 최신형 gemini-3.1-flash-lite-preview로 자동 변신!
+    if (provider === "gemini" && (activeModel.includes("gpt") || activeModel.includes("1.5") || activeModel.includes("2.0") || !activeModel)) {
+      activeModel = "gemini-3.1-flash-lite-preview";
     }
 
     const { systemPrompt, userPrompt } = buildPrompt(
