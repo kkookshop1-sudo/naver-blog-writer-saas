@@ -55,6 +55,7 @@ export default function MainPage() {
   const [topicSuggestions, setTopicSuggestions] = useState<string[]>([]);
   const [showTopicSuggest, setShowTopicSuggest] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [useSearch, setUseSearch] = useState(true); // 🐿️ 기본값: 실시간 자율형 ON! 
 
   const topicSuggestTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const topicWrapperRef = useRef<HTMLDivElement>(null);
@@ -160,11 +161,37 @@ export default function MainPage() {
     setLoading(true);
     try {
       let linkContext = "";
+      
+      // 🐿️ 부장의 자율형 수색 파트 (실시간 웹 정보 수집)
+      if (useSearch && topic.trim()) {
+        try {
+          const sRes = await fetch(`/api/search?q=${encodeURIComponent(topic.trim())}`);
+          const sData = await sRes.json();
+          if (sData.success) {
+            // 진짜 구글 사진들을 사진첩에 추가! (대표님이 원하시는 바로 그 실사 사진들)
+            if (sData.images && sData.images.length > 0) {
+              const uniqueImages = Array.from(new Set([...sData.images, ...imageList]));
+              setImageList(uniqueImages.slice(0, 15)); // 최대 15장까지 넉넉히!
+            }
+            
+            // 실시간 정보를 텍스트에 포함!
+            let contextText = sData.snippets.map((s: any) => `[${s.title}]\n${s.snippet}`).join("\n\n");
+            if (sData.todayIssues && sData.todayIssues.length > 0) {
+               contextText += "\n\n[오늘의 최신 이슈]\n" + sData.todayIssues.join(", ");
+            }
+            linkContext = contextText;
+          }
+        } catch (err) {
+          console.error("자율 수색 실패:", err);
+        }
+      }
+
       if (link.trim()) {
         const lRes = await fetch(`/api/analyze-link?url=${encodeURIComponent(link.trim())}`);
         const lData = await lRes.json();
         if (!lData.error) {
-          linkContext = `제목: ${lData.title}\n설명: ${lData.desc}\n내용 요약: ${lData.bodyText}`;
+          const fetchedLinkInfo = `\n\n[링크 참조 내용]\n제목: ${lData.title}\n설명: ${lData.desc}\n내용 요약: ${lData.bodyText}`;
+          linkContext += fetchedLinkInfo;
         }
       }
 
@@ -315,6 +342,19 @@ export default function MainPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <label className="label" style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+            <input 
+              type="checkbox" 
+              checked={useSearch} 
+              onChange={e => setUseSearch(e.target.checked)} 
+              style={{ width: "16px", height: "16px" }}
+            />
+            <span style={{ fontSize: "0.9rem", color: "#03C75A", fontWeight: 700 }}>실시간 검색 활용 (자율형 ✨)</span>
+          </label>
+          <p style={{ fontSize: "0.75rem", color: "#888", marginTop: "5px" }}>* 구글/네이버에서 실제 사진과 최신 정보를 긁어와서 반영합니다.</p>
         </div>
 
         <div style={{ marginTop: "auto" }}>

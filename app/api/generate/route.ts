@@ -54,8 +54,15 @@ export async function POST(req: Request) {
       provider = "openai",
       apiKey = "",
       contentOptions = {},
-      model = "gpt-4o-mini", // For OpenAI
     } = body;
+
+    // 🐿️ 모델 선택 로직 보강
+    let activeModel = body.model || (provider === "openai" ? "gpt-4o-mini" : "gemini-2.0-flash");
+    
+    // 만약 제미나이인데 모델명이 gpt인 경우 강제로 제미나이 모델로 교체
+    if (provider === "gemini" && (activeModel.includes("gpt") || !activeModel)) {
+      activeModel = "gemini-2.0-flash";
+    }
 
     const { systemPrompt, userPrompt } = buildPrompt(
       topic,
@@ -71,7 +78,7 @@ export async function POST(req: Request) {
       try {
         const genAI = new GoogleGenerativeAI(apiKey.trim());
         const geminiModel = genAI.getGenerativeModel({
-          model: model || "gemini-2.0-flash", // Use provided model or default
+          model: activeModel, 
         });
 
         // Prepare content parts for Gemini
@@ -150,7 +157,7 @@ export async function POST(req: Request) {
             Authorization: `Bearer ${apiKey.trim()}`,
           },
           body: JSON.stringify({
-            model: model || "gpt-4o-mini", // Use multimodal capable model
+            model: activeModel, // Use multimodal capable model
             messages: [{ role: "user", content: contentParts }],
           }),
         });
