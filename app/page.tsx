@@ -430,23 +430,35 @@ export default function MainPage() {
                 fontSize: "1.05rem",
                 color: "#334155"
               }}>
-                {result.split('\n').map((line, idx) => {
-                  const match = line.match(/\[IMAGE_PLACEHOLDER_(\d+)\]/);
+                {result.split(/(\[IMAGE_PLACEHOLDER_\d+\])/g).map((part, idx) => {
+                  const match = part.match(/\[IMAGE_PLACEHOLDER_(\d+)\]/);
                   if (match) {
                     const imgIdx = parseInt(match[1]);
                     const imgSrc = imageList[imgIdx];
                     return imgSrc ? (
-                      <div key={idx} style={{ margin: "25px 0", textAlign: "center" }}>
+                      <div key={idx} style={{ margin: "30px 0", textAlign: "center" }}>
                         <img 
                           src={imgSrc} 
-                          alt={`Placeholder ${imgIdx}`} 
-                          style={{ maxWidth: "100%", borderRadius: "8px", boxShadow: "0 4px 15px rgba(0,0,0,0.1)" }} 
+                          alt={`Resource ${imgIdx + 1}`} 
+                          style={{ maxWidth: "100%", borderRadius: "12px", boxShadow: "0 6px 20px rgba(0,0,0,0.15)" }} 
                         />
-                        <p style={{ fontSize: "0.8rem", color: "#94a3b8", marginTop: "10px" }}>[대표님의 고화질 이미지 {imgIdx + 1}]</p>
+                        <p style={{ fontSize: "0.85rem", color: "#94a3b8", marginTop: "12px", fontWeight: 500 }}>
+                          📸 이미지 #{imgIdx + 1}
+                        </p>
                       </div>
-                    ) : null;
+                    ) : (
+                      <div key={idx} style={{ padding: "20px", background: "#f8fafc", border: "1px dashed #cbd5e1", borderRadius: "8px", margin: "10px 0", textAlign: "center", color: "#94a3b8" }}>
+                        [이미지 {imgIdx + 1} 라이브러리에 없음]
+                      </div>
+                    );
                   }
-                  return <p key={idx} style={{ marginBottom: "15px", whiteSpace: "pre-wrap" }}>{line}</p>;
+                  
+                  // 줄바꿈 보존을 위해 다시 p 태그로 감싸기
+                  return part.split('\n').map((line, lIdx) => (
+                    <p key={`${idx}-${lIdx}`} style={{ marginBottom: line.trim() ? "15px" : "10px", minHeight: line.trim() ? "auto" : "1em" }}>
+                      {line}
+                    </p>
+                  ));
                 })}
               </div>
             ) : (
