@@ -42,7 +42,7 @@ Available images: ${imageUrls.length}.`;
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body: any = await req.json();
     const {
       topic = "",
       keywords = "",
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
         
         // Add images if any
         const imageParts = await Promise.all(
-          imageUrls.map(async (url) => {
+          imageUrls.map(async (url: string) => {
             if (url.startsWith("data:")) {
               const [mime, base64] = url.split(";base64,");
               return {
